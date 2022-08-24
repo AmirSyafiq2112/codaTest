@@ -8,10 +8,16 @@ import {
   listServerParams,
   topupParams,
 } from "../models/coda.models";
+
+import { jwtGenerator } from "../helper/index";
+
 import { getIAT } from "../helper/index";
 
 var url = process.env.CODA_VOUCHER_URL!;
 var sampleToken = process.env.SAMPLE_VOUCHER_TOKEN!;
+const secret = process.env.CODA_SECRET_KEY!;
+
+// var authorizationToken: Promise<string>;
 
 const paramsSentToCoda = (methodSent: object, objSent: object) => {
   var jsonrpc = "2.0";
@@ -32,15 +38,6 @@ var jsonPassed: {} = {};
 var newJson: {} = {};
 var productNameURL: string;
 var jsonPassedMethod: object;
-
-var config = {
-  headers: {
-    "x-api-key": "9ezEvY3UZv72ouqeLnzeL44ylrbPdZ5C6Y3e2c1H",
-    "x-api-version": "2.0",
-    authorization: sampleToken,
-    "Content-Type": "application/json",
-  },
-};
 
 export const test: RequestHandler = async (req, res) => {
   res.json(req.body);
@@ -101,6 +98,19 @@ export const productName: RequestHandler = async (req, res) => {
   console.log(newJson);
   res.send(newJson);
   codaVoucher(newJson);
+  console.log(authorizationToken);
+};
+
+var authorizationToken = jwtGenerator(config, newJson, secret);
+console.log(authorizationToken);
+
+var config: any = {
+  headers: {
+    "x-api-key": process.env.CODA_API_KEY!,
+    "x-api-version": "2.0",
+    authorization: authorizationToken,
+    "Content-Type": "application/json",
+  },
 };
 
 export const codaVoucher = (params: object) => {
