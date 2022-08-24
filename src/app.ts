@@ -7,7 +7,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(json);
+app.use(json()); //json must have ()
 
 app.use(urlencoded({ extended: true }));
 
@@ -26,6 +26,6 @@ app.use(
   }
 );
 
-app.listen(5000, () => {
-  console.log("server is running");
+app.listen(3000, () => {
+  console.log("server is running on port 3000");
 });

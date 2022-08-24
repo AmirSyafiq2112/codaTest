@@ -4,10 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+// import { getIAT } from "../helper/index";
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const coda_controller_1 = require("../controller/coda.controller");
 const router = (0, express_1.Router)();
-router.get("/:productName", coda_controller_1.productName);
-router.post("/", coda_controller_1.coda);
+router.get("/test", coda_controller_1.test);
+router.post("/:productName", coda_controller_1.productName);
+// router.post("/", coda);
 exports.default = router;
