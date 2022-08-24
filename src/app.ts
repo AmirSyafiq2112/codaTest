@@ -1,7 +1,6 @@
 import express from "express";
 import router from "./routes/coda.routes.js";
 import { json, urlencoded } from "body-parser";
-import jwt from "jsonwebtoken";
 
 import dotenv from "dotenv";
 dotenv.config();
