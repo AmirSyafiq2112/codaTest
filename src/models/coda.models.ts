@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { getIAT } from "../helper";
+import { getIAT } from "../helper/coda.helper";
 
 export const placeOrderParams = Joi.object({
   method: Joi.string().valid("placeOrder"),
