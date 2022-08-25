@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.jwtGenerator = exports.getIAT = void 0;
 const crypto_js_1 = __importDefault(require("crypto-js"));
+// import postman from 'postman'
 const getIAT = () => {
     return Math.floor(Date.now() / 1000) + 257;
 };
@@ -30,16 +31,18 @@ const base64url = (source) => {
     return encodedSource;
 };
 const jwtGenerator = (headers, payload, secret) => __awaiter(void 0, void 0, void 0, function* () {
+    // var varObj = postman.globals.toObject()
     var stringifyHeaders = JSON.stringify(headers);
     var encodedHeader = base64url(stringifyHeaders);
     var stringifyPayload = JSON.stringify(payload);
     var encodedPayload = base64url(stringifyPayload);
     var token = encodedHeader + "." + encodedPayload;
     var signature = crypto_js_1.default.HmacSHA256(token, secret);
+    // console.log("secret :" + secret);
     var stringifySignature = JSON.stringify(signature);
     var encodedSignature = base64url(stringifySignature);
-    var signedToken = token + "." + signature;
-    console.log(signedToken);
+    var signedToken = token + "." + encodedSignature;
+    // console.log(signedToken);
     return signedToken;
 });
 exports.jwtGenerator = jwtGenerator;

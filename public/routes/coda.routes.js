@@ -10,6 +10,6 @@ dotenv_1.default.config();
 const coda_controller_1 = require("../controller/coda.controller");
 const router = (0, express_1.Router)();
 router.get("/test", coda_controller_1.test);
-router.post("/:productName", coda_controller_1.productName);
+router.post("/api/:productName", coda_controller_1.productName);
 // router.post("/", coda);
 exports.default = router;

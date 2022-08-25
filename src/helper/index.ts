@@ -1,42 +1,47 @@
 import jwt from "jsonwebtoken";
 import CryptoJS from "crypto-js";
+import { any, string } from "joi";
+// import postman from 'postman'
 
 export const getIAT = () => {
-  return Math.floor(Date.now() / 1000) + 257;
+	return Math.floor(Date.now() / 1000) + 257;
 };
 
 const base64url = (source: string) => {
-  // Encode in classical base64'
-  var wordArraySource = CryptoJS.enc.Utf8.parse(source);
-  var encodedSource = CryptoJS.enc.Base64.stringify(wordArraySource);
-  // Remove padding equal characters
-  encodedSource = encodedSource.replace(/=+$/, "");
-  // Replace characters according to base64url specifications
-  encodedSource = encodedSource.replace(/\+/g, "-");
-  encodedSource = encodedSource.replace(/\//g, "_");
-  return encodedSource;
+	// Encode in classical base64'
+	var wordArraySource = CryptoJS.enc.Utf8.parse(source);
+	var encodedSource = CryptoJS.enc.Base64.stringify(wordArraySource);
+	// Remove padding equal characters
+	encodedSource = encodedSource.replace(/=+$/, "");
+	// Replace characters according to base64url specifications
+	encodedSource = encodedSource.replace(/\+/g, "-");
+	encodedSource = encodedSource.replace(/\//g, "_");
+	return encodedSource;
 };
 
 export const jwtGenerator = async (
-  headers: object,
-  payload: object,
-  secret: string
+	headers: object,
+	payload: object,
+	secret: string
 ) => {
-  var stringifyHeaders = JSON.stringify(headers);
-  var encodedHeader = base64url(stringifyHeaders);
+	// var varObj = postman.globals.toObject()
 
-  var stringifyPayload = JSON.stringify(payload);
-  var encodedPayload = base64url(stringifyPayload);
+	var stringifyHeaders = JSON.stringify(headers);
+	var encodedHeader = base64url(stringifyHeaders);
 
-  var token = encodedHeader + "." + encodedPayload;
+	var stringifyPayload = JSON.stringify(payload);
+	var encodedPayload = base64url(stringifyPayload);
 
-  var signature = CryptoJS.HmacSHA256(token, secret);
-  var stringifySignature = JSON.stringify(signature);
-  var encodedSignature = base64url(stringifySignature);
+	var token = encodedHeader + "." + encodedPayload;
 
-  var signedToken = token + "." + signature;
+	var signature = CryptoJS.HmacSHA256(token, secret);
+	// console.log("secret :" + secret);
+	var stringifySignature = JSON.stringify(signature);
+	var encodedSignature = base64url(stringifySignature);
 
-  console.log(signedToken);
+	var signedToken = token + "." + encodedSignature;
 
-  return signedToken;
+	// console.log(signedToken);
+
+	return signedToken;
 };

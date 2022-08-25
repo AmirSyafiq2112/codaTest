@@ -35,14 +35,16 @@ exports.listSkuParams = joi_1.default.object({
 exports.validateParams = joi_1.default.object({
     method: joi_1.default.string().valid("validate"),
     params: joi_1.default.object({
-        items: joi_1.default.array().items({
+        items: joi_1.default.array()
+            .items({
             sku: joi_1.default.string(),
             quantity: joi_1.default.number().default(1).required(),
             price: joi_1.default.object({
                 currency: joi_1.default.string(),
                 amount: joi_1.default.number().required(),
-            }),
-        }),
+            }).required(),
+        })
+            .required(),
     }),
 });
 exports.topupParams = joi_1.default.object({
