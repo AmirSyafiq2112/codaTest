@@ -9,24 +9,28 @@ import {
   topupParams,
 } from "../models/coda.models";
 
-import { jwtGenerator } from "../helper/index";
+import { jwtGenerator } from "../helper/coda.helper";
 
-import { getIAT } from "../helper/index";
+import { getIAT } from "../helper/coda.helper";
+import { object } from "joi";
 
-var url = process.env.CODA_VOUCHER_URL!;
-var sampleToken = process.env.SAMPLE_VOUCHER_TOKEN!;
+// const url = process.env.CODA_VOUCHER_URL!;
+const url = "https://xshop.codashop.com/";
+const sampleToken = process.env.SAMPLE_VOUCHER_TOKEN!;
 const secret = process.env.CODA_SECRET_KEY!;
+const apiKey = process.env.CODA_API_KEY!;
+const clientId = process.env.CODA_CLIENT_ID!;
 
 // var authorizationToken: Promise<string>;
 
 const paramsSentToCoda = (methodSent: object, objSent: object) => {
   var jsonrpc = "2.0";
-  var id = "12345";
+  var id = "customersIdHere";
   var method = jsonPassedMethod;
 
   let newParams = Object.assign({}, objSent, {
-    customerId: "customersIdHere",
-    iat: 1524535871,
+    customerId: "1",
+    iat: getIAT(),
   });
 
   var params = newParams;
@@ -36,6 +40,7 @@ const paramsSentToCoda = (methodSent: object, objSent: object) => {
 
 var jsonPassed: {} = {};
 var newJson: {} = {};
+var header: {} = {};
 var productNameURL: string;
 var jsonPassedMethod: object;
 
@@ -49,8 +54,15 @@ export const productName: RequestHandler = async (req, res) => {
   jsonPassedMethod = req.body.method;
   var jsonPassedParams = req.body.params; //params object from requested JSON
 
+  header = {
+    alg: "HS256",
+    typ: "JWT",
+    "x-api-key": apiKey,
+    "x-api-version": "2.0",
+    "x-client-id": clientId,
+  };
+
   if (req.body.method === "placeOrder") {
-    console.log("here");
     const { error, value } = placeOrderParams.validate(jsonPassed);
     if (error) {
       console.log(error.details[0].message);
@@ -94,36 +106,38 @@ export const productName: RequestHandler = async (req, res) => {
   }
 
   newJson = paramsSentToCoda(jsonPassedMethod, jsonPassedParams);
-  console.log(jsonPassedMethod);
-  console.log(newJson);
+  // console.log(jsonPassedMethod);
+  // console.log(newJson);
   res.send(newJson);
-  codaVoucher(newJson);
-  console.log(authorizationToken);
+  var authorizationToken = await jwtGenerator(header, newJson, secret);
+  // var bearerToken = "Bearer " + authorizationToken;
+  // console.log(authorizationToken);
+  codaVoucher(newJson, authorizationToken);
 };
 
-var authorizationToken = jwtGenerator(config, newJson, secret);
-console.log(authorizationToken);
+export const codaVoucher = async (payload: object, token: string) => {
+  var config: any = {
+    headers: {
+      "x-api-key": apiKey,
+      "x-api-version": "2.0",
+      authorization: token,
+      "Content-Type": "application/json",
+    },
+  };
 
-var config: any = {
-  headers: {
-    "x-api-key": process.env.CODA_API_KEY!,
-    "x-api-version": "2.0",
-    authorization: authorizationToken,
-    "Content-Type": "application/json",
-  },
-};
-
-export const codaVoucher = (params: object) => {
+  var headerForAxios = { ...config };
+  console.debug(config);
   axios
-    .post(url + productNameURL, params, config)
+    .post(url + productNameURL, payload, config)
     .then((response) => {
       console.log("success");
       console.log(response.data);
     })
     .catch((error) => {
       console.log("error");
-      // console.log(error.response.status + " " + error.response.statusText);
-      // console.log(error);
+      // console.log(error.response);
+      console.log(error.response.status + " " + error.response.statusText);
+      console.log(error.response);
     });
 };
 // export const coda: RequestHandler = async (req, res) => {

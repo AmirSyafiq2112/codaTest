@@ -11,7 +11,7 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, body_parser_1.json)()); //json must have ()
 app.use((0, body_parser_1.urlencoded)({ extended: true }));
-app.use("/", coda_routes_js_1.default);
+app.use("/coda", coda_routes_js_1.default);
 //middleware: error handling
 app.use((err, req, res, next) => {
     res.status(500).json({ message: err.message });

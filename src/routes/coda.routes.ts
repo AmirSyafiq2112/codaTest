@@ -10,7 +10,7 @@ const router = Router();
 
 router.get("/test", test);
 
-router.post("/:productName", productName);
+router.post("/api/:productName", productName);
 
 // router.post("/", coda);
 

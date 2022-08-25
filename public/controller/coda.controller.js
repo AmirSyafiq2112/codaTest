@@ -15,24 +15,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.codaVoucher = exports.productName = exports.test = void 0;
 const axios_1 = __importDefault(require("axios"));
 const coda_models_1 = require("../models/coda.models");
-const index_1 = require("../helper/index");
-var url = process.env.CODA_VOUCHER_URL;
-var sampleToken = process.env.SAMPLE_VOUCHER_TOKEN;
+const coda_helper_1 = require("../helper/coda.helper");
+const coda_helper_2 = require("../helper/coda.helper");
+// const url = process.env.CODA_VOUCHER_URL!;
+const url = "https://xshop.codashop.com/";
+const sampleToken = process.env.SAMPLE_VOUCHER_TOKEN;
 const secret = process.env.CODA_SECRET_KEY;
+const apiKey = process.env.CODA_API_KEY;
+const clientId = process.env.CODA_CLIENT_ID;
 // var authorizationToken: Promise<string>;
 const paramsSentToCoda = (methodSent, objSent) => {
     var jsonrpc = "2.0";
-    var id = "12345";
+    var id = "customersIdHere";
     var method = jsonPassedMethod;
     let newParams = Object.assign({}, objSent, {
-        customerId: "customersIdHere",
-        iat: 1524535871,
+        customerId: "1",
+        iat: (0, coda_helper_2.getIAT)(),
     });
     var params = newParams;
     return { jsonrpc, id, method, params };
 };
 var jsonPassed = {};
 var newJson = {};
+var header = {};
 var productNameURL;
 var jsonPassedMethod;
 const test = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -44,8 +49,14 @@ const productName = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     jsonPassed = req.body;
     jsonPassedMethod = req.body.method;
     var jsonPassedParams = req.body.params; //params object from requested JSON
+    header = {
+        alg: "HS256",
+        typ: "JWT",
+        "x-api-key": apiKey,
+        "x-api-version": "2.0",
+        "x-client-id": clientId,
+    };
     if (req.body.method === "placeOrder") {
-        console.log("here");
         const { error, value } = coda_models_1.placeOrderParams.validate(jsonPassed);
         if (error) {
             console.log(error.details[0].message);
@@ -88,36 +99,39 @@ const productName = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
     }
     newJson = paramsSentToCoda(jsonPassedMethod, jsonPassedParams);
-    console.log(jsonPassedMethod);
-    console.log(newJson);
+    // console.log(jsonPassedMethod);
+    // console.log(newJson);
     res.send(newJson);
-    (0, exports.codaVoucher)(newJson);
-    console.log(authorizationToken);
+    var authorizationToken = yield (0, coda_helper_1.jwtGenerator)(header, newJson, secret);
+    // var bearerToken = "Bearer " + authorizationToken;
+    // console.log(authorizationToken);
+    (0, exports.codaVoucher)(newJson, authorizationToken);
 });
 exports.productName = productName;
-var authorizationToken = (0, index_1.jwtGenerator)(config, newJson, secret);
-console.log(authorizationToken);
-var config = {
-    headers: {
-        "x-api-key": process.env.CODA_API_KEY,
-        "x-api-version": "2.0",
-        authorization: authorizationToken,
-        "Content-Type": "application/json",
-    },
-};
-const codaVoucher = (params) => {
+const codaVoucher = (payload, token) => __awaiter(void 0, void 0, void 0, function* () {
+    var config = {
+        headers: {
+            "x-api-key": apiKey,
+            "x-api-version": "2.0",
+            authorization: token,
+            "Content-Type": "application/json",
+        },
+    };
+    var headerForAxios = Object.assign({}, config);
+    console.debug(config);
     axios_1.default
-        .post(url + productNameURL, params, config)
+        .post(url + productNameURL, payload, config)
         .then((response) => {
         console.log("success");
         console.log(response.data);
     })
         .catch((error) => {
         console.log("error");
-        // console.log(error.response.status + " " + error.response.statusText);
-        // console.log(error);
+        // console.log(error.response);
+        console.log(error.response.status + " " + error.response.statusText);
+        console.log(error.response);
     });
-};
+});
 exports.codaVoucher = codaVoucher;
 // export const coda: RequestHandler = async (req, res) => {
 //   if (req.body.method === "placeOrder") {

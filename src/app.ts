@@ -11,7 +11,7 @@ app.use(json()); //json must have ()
 
 app.use(urlencoded({ extended: true }));
 
-app.use("/", router);
+app.use("/coda", router);
 
 //middleware: error handling
 app.use(

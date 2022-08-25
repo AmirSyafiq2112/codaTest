@@ -34,9 +34,11 @@ export const jwtGenerator = async (
   var stringifySignature = JSON.stringify(signature);
   var encodedSignature = base64url(stringifySignature);
 
-  var signedToken = token + "." + signature;
+  var signedToken = token + "." + encodedSignature;
 
-  console.log(signedToken);
+  var bearerToken = "Bearer " + signedToken;
 
-  return signedToken;
+  // console.log(bearerToken);
+
+  return bearerToken;
 };
