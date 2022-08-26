@@ -21,6 +21,7 @@ export const getOrderParams = Joi.object({
   method: Joi.string().valid("getOrder"),
   params: Joi.object({
     orderId: Joi.string().required(),
+    iat: Joi.number(),
   }),
 });
 

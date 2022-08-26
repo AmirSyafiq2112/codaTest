@@ -24,6 +24,7 @@ exports.getOrderParams = joi_1.default.object({
     method: joi_1.default.string().valid("getOrder"),
     params: joi_1.default.object({
         orderId: joi_1.default.string().required(),
+        iat: joi_1.default.number(),
     }),
 });
 exports.listSkuParams = joi_1.default.object({

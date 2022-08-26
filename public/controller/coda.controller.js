@@ -15,32 +15,87 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.codaVoucher = exports.productName = exports.test = void 0;
 const axios_1 = __importDefault(require("axios"));
 const codaLog_helper_1 = require("../helper/codaLog.helper");
-const coda_models_1 = require("../models/coda.models");
 const coda_helper_1 = require("../helper/coda.helper");
 const coda_helper_2 = require("../helper/coda.helper");
-const url = process.env.CODA_VOUCHER_URL;
-// const url = "https://xshop.codashop.com/";
-const sampleToken = process.env.SAMPLE_VOUCHER_TOKEN;
+const coda_models_1 = require("../models/coda.models");
+// const sampleToken = process.env.SAMPLE_VOUCHER_TOKEN!;
+// const url = "https://xshop.codashop.com/";           /*for staging*/
+const url = process.env.CODA_VOUCHER_URL; /*for development*/
 const secret = process.env.CODA_SECRET_KEY;
 const apiKey = process.env.CODA_API_KEY;
 const clientId = process.env.CODA_CLIENT_ID;
-// var authorizationToken: Promise<string>;
-const paramsSentToCoda = (methodSent, objSent) => {
-    var jsonrpc = "2.0";
-    var id = "customersIdHere";
-    var method = jsonPassedMethod;
-    let newParams = Object.assign({}, objSent, {
-        customerId: "1",
-        iat: (0, coda_helper_2.getIAT)(),
-    });
-    var params = newParams;
-    return { jsonrpc, id, method, params };
-};
+//initialized variable globally, so all function can use it
 var jsonPassed = {};
 var newJson = {};
 var header = {};
 var productNameURL;
 var jsonPassedMethod;
+//updating the params sent from main Api differently by each methods requirements
+const paramsSentToCoda = (methodSent, objSent) => {
+    var jsonrpc = "2.0";
+    var id = "customersIdHere";
+    var method = methodSent;
+    var params = {};
+    var methodToString = Object(method);
+    if (methodToString == "placeOrder") {
+        console.log(`method: ${methodToString}`);
+        let newParams = Object.assign({}, objSent, {
+            customerId: "1",
+            iat: (0, coda_helper_2.getIAT)(),
+        });
+        params = newParams;
+        createJson({ jsonrpc, id, method, params });
+    }
+    else if (methodToString == "getOrder") {
+        console.log(`method: ${methodToString}`);
+        let newParams = Object.assign({}, objSent, {
+            orderId: "1",
+            iat: (0, coda_helper_2.getIAT)(),
+        });
+        params = newParams;
+        createJson({ jsonrpc, id, method, params });
+    }
+    else if (methodToString == "listSku") {
+        console.log(`method: ${methodToString}`);
+        let newParams = Object.assign({}, objSent, {
+            iat: (0, coda_helper_2.getIAT)(),
+        });
+        params = newParams;
+        createJson({ jsonrpc, id, method, params });
+    }
+    else if (methodToString == "listServer") {
+        console.log(`method: ${methodToString}`);
+        let newParams = Object.assign({}, objSent, {
+            customerId: "1",
+            iat: (0, coda_helper_2.getIAT)(),
+        });
+        params = newParams;
+        createJson({ jsonrpc, id, method, params });
+    }
+    else if (methodToString == "validate") {
+        console.log(`method: ${methodToString}`);
+        let newParams = Object.assign({}, objSent, {
+            userAccount: "userId_zoneId",
+            customerId: "1",
+            iat: (0, coda_helper_2.getIAT)(),
+        });
+        params = newParams;
+        createJson({ jsonrpc, id, method, params });
+    }
+    else if (methodToString == "topup") {
+        console.log(`method: ${methodToString}`);
+        let newParams = Object.assign({}, objSent, {
+            userAccount: "userId_zoneId",
+            customerId: "1",
+            iat: (0, coda_helper_2.getIAT)(),
+        });
+        params = newParams;
+        createJson({ jsonrpc, id, method, params });
+    }
+};
+const createJson = (newJsonParams) => {
+    newJson = newJsonParams;
+};
 const test = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json(req.body);
 });
@@ -49,15 +104,9 @@ const productName = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     productNameURL = req.params.productName;
     jsonPassed = req.body;
     jsonPassedMethod = req.body.method;
-    var jsonPassedParams = req.body.params; //params object from requested JSON
-    header = {
-        alg: "HS256",
-        typ: "JWT",
-        "x-api-key": apiKey,
-        "x-api-version": "2.0",
-        "x-client-id": clientId,
-    };
-    if (req.body.method === "placeOrder") {
+    var jsonPassedParams = req.body.params; /*params object from requested JSON from main Api*/
+    //validate params sent using Joi Schema
+    if (jsonPassedParams === "placeOrder") {
         const { error, value } = coda_models_1.placeOrderParams.validate(jsonPassed);
         if (error) {
             console.log(error.details[0].message);
@@ -99,17 +148,27 @@ const productName = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             return res.send("invalid request");
         }
     }
-    newJson = paramsSentToCoda(jsonPassedMethod, jsonPassedParams);
-    // console.log(jsonPassedMethod);
-    // console.log(newJson);
-    res.send(newJson);
+    //validate ends
+    paramsSentToCoda(jsonPassedMethod, jsonPassedParams);
+    // console.debug(jsonPassedMethod);               /*debug json passed from main Api*/
+    // console.debug(newJson);                        /*debug updated json so it filled the requirement parameters for CODA*/
+    res.send(newJson); /*console it to postman for validating the success of updated json, no further purposes */
+    //Generate JWT for authorization header
+    header = {
+        alg: "HS256",
+        typ: "JWT",
+        "x-api-key": apiKey,
+        "x-api-version": "2.0",
+        "x-client-id": clientId,
+    };
     var authorizationToken = yield (0, coda_helper_1.jwtGenerator)(header, newJson, secret);
-    // var bearerToken = "Bearer " + authorizationToken;
-    // console.log(authorizationToken);
+    // console.debug(authorizationToken);                 /*debug JWT generated before send to CODA */
     (0, exports.codaVoucher)(newJson, authorizationToken);
 });
 exports.productName = productName;
+//Send request to CODA Api using axios, parameter is url,payload and header
 const codaVoucher = (payload, token) => __awaiter(void 0, void 0, void 0, function* () {
+    //HEADER for CODA
     var config = {
         headers: {
             "x-api-key": apiKey,
@@ -118,8 +177,7 @@ const codaVoucher = (payload, token) => __awaiter(void 0, void 0, void 0, functi
             "Content-Type": "application/json",
         },
     };
-    var headerForAxios = Object.assign({}, config);
-    console.debug(config);
+    // console.debug(config);
     axios_1.default
         .post(url + productNameURL, payload, config)
         .then((response) => {
@@ -127,48 +185,11 @@ const codaVoucher = (payload, token) => __awaiter(void 0, void 0, void 0, functi
         console.log(response.data);
     })
         .catch((error) => {
-        console.log("error");
-        // console.log(error.response);
         console.log(error.response.status + " " + error.response.statusText);
-        console.log(error.response);
+        console.log(error.response.data);
+        //for logging error
+        codaLog_helper_1.logger.error(error.response.status + " " + error.response.statusText);
         codaLog_helper_1.logger.error(error.response.data);
     });
 });
 exports.codaVoucher = codaVoucher;
-// export const coda: RequestHandler = async (req, res) => {
-//   if (req.body.method === "placeOrder") {
-//     voucher = {
-//       jsonrpc: "2.0",
-//       id: "12345",
-//       method: "placeOrder",
-//       params: {
-//         items: [
-//           {
-//             sku: "SAMPLE-SKU-0U36C",
-//             quantity: 1,
-//             price: {
-//               currency: "VND",
-//               amount: 10000,
-//             },
-//           },
-//         ],
-//         customerId: "customersIdHere",
-//         iat: 1524535871,
-//       },
-//     };
-//   }
-//   axios
-//     .post(url, voucher, config)
-//     .then((response) => {
-//       console.log(response);
-//       res.json(response);
-//     })
-//     .catch((error) => {
-//       if (error.response) {
-//         let { status, statusText } = error.response;
-//         console.log(error.response.data);
-//         console.log(status, statusText);
-//         res.status(status).send(statusText);
-//       } else res.status(404).send(error);
-//     });
-// };
