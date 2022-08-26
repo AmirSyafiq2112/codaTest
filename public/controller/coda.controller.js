@@ -14,11 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.codaVoucher = exports.productName = exports.test = void 0;
 const axios_1 = __importDefault(require("axios"));
+const codaLog_helper_1 = require("../helper/codaLog.helper");
 const coda_models_1 = require("../models/coda.models");
 const coda_helper_1 = require("../helper/coda.helper");
 const coda_helper_2 = require("../helper/coda.helper");
-// const url = process.env.CODA_VOUCHER_URL!;
-const url = "https://xshop.codashop.com/";
+const url = process.env.CODA_VOUCHER_URL;
+// const url = "https://xshop.codashop.com/";
 const sampleToken = process.env.SAMPLE_VOUCHER_TOKEN;
 const secret = process.env.CODA_SECRET_KEY;
 const apiKey = process.env.CODA_API_KEY;
@@ -130,6 +131,7 @@ const codaVoucher = (payload, token) => __awaiter(void 0, void 0, void 0, functi
         // console.log(error.response);
         console.log(error.response.status + " " + error.response.statusText);
         console.log(error.response);
+        codaLog_helper_1.logger.error(error.response.data);
     });
 });
 exports.codaVoucher = codaVoucher;

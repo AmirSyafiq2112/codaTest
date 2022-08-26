@@ -1,5 +1,6 @@
 import axios from "axios";
 import { RequestHandler, response } from "express";
+import { logger, requestLogger } from "../helper/codaLog.helper";
 import {
   placeOrderParams,
   getOrderParams,
@@ -14,8 +15,8 @@ import { jwtGenerator } from "../helper/coda.helper";
 import { getIAT } from "../helper/coda.helper";
 import { object } from "joi";
 
-// const url = process.env.CODA_VOUCHER_URL!;
-const url = "https://xshop.codashop.com/";
+const url = process.env.CODA_VOUCHER_URL!;
+// const url = "https://xshop.codashop.com/";
 const sampleToken = process.env.SAMPLE_VOUCHER_TOKEN!;
 const secret = process.env.CODA_SECRET_KEY!;
 const apiKey = process.env.CODA_API_KEY!;
@@ -138,6 +139,7 @@ export const codaVoucher = async (payload: object, token: string) => {
       // console.log(error.response);
       console.log(error.response.status + " " + error.response.statusText);
       console.log(error.response);
+      logger.error(error.response.data);
     });
 };
 // export const coda: RequestHandler = async (req, res) => {

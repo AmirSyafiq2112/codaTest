@@ -1,0 +1,17 @@
+{
+  message: { message: null },
+  level: 'error',
+  timestamp: '2022-08-26T01:38:23.555Z'
+}
+{
+  message: { message: null },
+  level: 'error',
+  timestamp: '2022-08-26T01:39:46.310Z'
+}
+{
+  message: {
+    Message: 'User is not authorized to access this resource with an explicit deny'
+  },
+  level: 'error',
+  timestamp: '2022-08-26T01:49:24.244Z'
+}
