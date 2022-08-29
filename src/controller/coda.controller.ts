@@ -14,8 +14,8 @@ import {
 } from "../models/coda.models";
 
 // const sampleToken = process.env.SAMPLE_VOUCHER_TOKEN!;
-// const url = "https://xshop.codashop.com/";           /*for staging*/
-const url = process.env.CODA_VOUCHER_URL!; /*for development*/
+// const url = process.env.CODA_PRODUCTION_URL;        /*for production*/
+const url = process.env.CODA_VOUCHER_URL!; /*for staging*/
 const secret = process.env.CODA_SECRET_KEY!;
 const apiKey = process.env.CODA_API_KEY!;
 const clientId = process.env.CODA_CLIENT_ID!;
