@@ -1,6 +1,17 @@
 import jwt from "jsonwebtoken";
 import CryptoJS from "crypto-js";
 
+export const getRandomInt = () => {
+  return Math.floor(Math.random() * 99999);
+
+  /*  if we want min max the id value
+  
+   min = Math.ceil(min);
+   max = Math.floor(max);
+   return Math.floor(Math.random() * (max - min) + min); // The 
+  */
+};
+
 export const getIAT = () => {
   return Math.floor(Date.now() / 1000) + 257;
 };

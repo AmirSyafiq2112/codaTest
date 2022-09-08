@@ -1,5 +1,4 @@
 import Joi from "joi";
-import { getIAT } from "../helper/coda.helper";
 
 export const placeOrderParams = Joi.object({
   method: Joi.string().valid("placeOrder"),
@@ -14,6 +13,7 @@ export const placeOrderParams = Joi.object({
         }),
       })
       .required(),
+    customerId: Joi.string().required(),
   }),
 });
 
@@ -21,15 +21,12 @@ export const getOrderParams = Joi.object({
   method: Joi.string().valid("getOrder"),
   params: Joi.object({
     orderId: Joi.string().required(),
-    iat: Joi.number(),
   }),
 });
 
 export const listSkuParams = Joi.object({
   method: Joi.string().valid("listSku"),
-  params: Joi.object({
-    iat: Joi.number(),
-  }),
+  params: Joi.object({}),
 });
 
 export const validateParams = Joi.object({
@@ -43,6 +40,8 @@ export const validateParams = Joi.object({
         amount: Joi.number().required(),
       }),
     }),
+    userAccount: Joi.string().required(),
+    customerId: Joi.string().required(),
   }),
 });
 
@@ -59,11 +58,11 @@ export const topupParams = Joi.object({
       }),
     }),
   }),
+  userAccount: Joi.string().required(),
+  customerId: Joi.string().required(),
 });
 
 export const listServerParams = Joi.object({
   method: Joi.string().valid("listServer"),
-  params: Joi.object({
-    iat: Joi.number(),
-  }),
+  params: Joi.object({}),
 });

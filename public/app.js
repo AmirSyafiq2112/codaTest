@@ -13,11 +13,6 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, body_parser_1.json)()); //json must have ()
 app.use((0, body_parser_1.urlencoded)({ extended: true }));
-//middelware: winstonlogger for requestLogger
-app.use(express_winston_1.default.logger({
-    winstonInstance: codaLog_helper_1.requestLogger,
-    statusLevels: true,
-}));
 //middleware: express winston; wrapper for logger
 express_winston_1.default.requestWhitelist.push("body");
 express_winston_1.default.responseWhitelist.push("body");

@@ -1,39 +1,32 @@
 import winston, { createLogger, format, transports } from "winston";
+// import path from "path";
 
 const logsFolder = "src/logs/";
 
-const loggerTransport = [
-  new transports.File({
-    level: "info",
-    filename: `${logsFolder}logs.log`,
-  }),
-];
+const logFormat = format.printf(
+  (info) => `${info.timestamp} ${info.level} : ${info.message}`
+);
 
-const loggerRequestTransport = [
-  new transports.File({
-    level: "warn",
-    filename: `${logsFolder}codaLogs.log`,
-  }),
-  new transports.File({
-    level: "warn",
-    filename: `${logsFolder}codaLogs.log`,
-  }),
-];
-
-export const logger = createLogger({
-  transports: loggerTransport,
+export const logger = winston.createLogger({
+  level: "info",
   format: format.combine(
-    format.timestamp(),
-    format.simple(),
-    format.prettyPrint()
+    format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    // Format the metadata object
+    format.metadata({ fillExcept: ["message", "level", "timestamp"] })
   ),
-});
-
-export const requestLogger = createLogger({
-  transports: loggerRequestTransport,
-  format: format.combine(
-    format.timestamp(),
-    format.simple(),
-    format.prettyPrint()
-  ),
+  transports: [
+    new transports.Console({
+      format: format.combine(format.colorize(), logFormat),
+    }),
+    new transports.File({
+      filename: `${logsFolder}codaLogs.log`,
+      format: format.combine(
+        // Render in one line in your log file.
+        // If you use prettyPrint() here it will be really
+        // difficult to exploit your logs files afterwards.
+        format.json()
+      ),
+    }),
+  ],
+  exitOnError: false,
 });

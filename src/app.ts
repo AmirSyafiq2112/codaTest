@@ -2,7 +2,7 @@ import express from "express";
 import router from "./routes/coda.routes.js";
 import { json, urlencoded } from "body-parser";
 import expressWinston from "express-winston";
-import { logger, requestLogger } from "./helper/codaLog.helper";
+import { logger } from "./helper/codaLog.helper";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -12,14 +12,6 @@ const app = express();
 app.use(json()); //json must have ()
 
 app.use(urlencoded({ extended: true }));
-
-//middelware: winstonlogger for requestLogger
-app.use(
-  expressWinston.logger({
-    winstonInstance: requestLogger,
-    statusLevels: true,
-  })
-);
 
 //middleware: express winston; wrapper for logger
 expressWinston.requestWhitelist.push("body");

@@ -1,9 +1,9 @@
 import axios from "axios";
 import { RequestHandler, response } from "express";
 
-import { logger, requestLogger } from "../helper/codaLog.helper";
+import { logger } from "../helper/codaLog.helper";
 import { jwtGenerator } from "../helper/coda.helper";
-import { getIAT } from "../helper/coda.helper";
+import { getRandomInt, getIAT } from "../helper/coda.helper";
 import {
   placeOrderParams,
   getOrderParams,
@@ -30,74 +30,20 @@ var jsonPassedMethod: object;
 //updating the params sent from main Api differently by each methods requirements
 const paramsSentToCoda = (methodSent: object, objSent: object) => {
   var jsonrpc = "2.0";
-  var id = "customersIdHere";
+  var id = getRandomInt();
   var method = methodSent;
   var params: {} = {};
 
   var methodToString = Object(method);
 
-  if (methodToString == "placeOrder") {
-    console.log(`method: ${methodToString}`);
-    let newParams = Object.assign({}, objSent, {
-      customerId: "1",
-      iat: getIAT(),
-    });
+  console.log(`method: ${methodToString}`);
+  let newParams = Object.assign({}, objSent, {
+    iat: getIAT(),
+  });
 
-    params = newParams;
+  params = newParams;
 
-    createJson({ jsonrpc, id, method, params });
-  } else if (methodToString == "getOrder") {
-    console.log(`method: ${methodToString}`);
-    let newParams = Object.assign({}, objSent, {
-      orderId: "1",
-      iat: getIAT(),
-    });
-
-    params = newParams;
-
-    createJson({ jsonrpc, id, method, params });
-  } else if (methodToString == "listSku") {
-    console.log(`method: ${methodToString}`);
-    let newParams = Object.assign({}, objSent, {
-      iat: getIAT(),
-    });
-
-    params = newParams;
-
-    createJson({ jsonrpc, id, method, params });
-  } else if (methodToString == "listServer") {
-    console.log(`method: ${methodToString}`);
-    let newParams = Object.assign({}, objSent, {
-      customerId: "1",
-      iat: getIAT(),
-    });
-
-    params = newParams;
-
-    createJson({ jsonrpc, id, method, params });
-  } else if (methodToString == "validate") {
-    console.log(`method: ${methodToString}`);
-    let newParams = Object.assign({}, objSent, {
-      userAccount: "userId_zoneId",
-      customerId: "1",
-      iat: getIAT(),
-    });
-
-    params = newParams;
-
-    createJson({ jsonrpc, id, method, params });
-  } else if (methodToString == "topup") {
-    console.log(`method: ${methodToString}`);
-    let newParams = Object.assign({}, objSent, {
-      userAccount: "userId_zoneId",
-      customerId: "1",
-      iat: getIAT(),
-    });
-
-    params = newParams;
-
-    createJson({ jsonrpc, id, method, params });
-  }
+  createJson({ jsonrpc, id, method, params });
 };
 
 const createJson = (newJsonParams: object) => {
@@ -200,11 +146,9 @@ export const codaVoucher = async (payload: object, token: string) => {
       console.log(response.data);
     })
     .catch((error) => {
-      console.log(error.response.status + " " + error.response.statusText);
-      console.log(error.response.data);
-
       //for logging error
-      logger.error(error.response.status + " " + error.response.statusText);
-      logger.error(error.response.data);
+      logger.error(error.response.status + " " + error.response.statusText, {
+        method: jsonPassedMethod,
+      });
     });
 };

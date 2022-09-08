@@ -12,8 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jwtGenerator = exports.getIAT = void 0;
+exports.jwtGenerator = exports.getIAT = exports.getRandomInt = void 0;
 const crypto_js_1 = __importDefault(require("crypto-js"));
+const getRandomInt = () => {
+    return Math.floor(Math.random() * 99999);
+    /*  if we want min max the id value
+    
+     min = Math.ceil(min);
+     max = Math.floor(max);
+     return Math.floor(Math.random() * (max - min) + min); // The
+    */
+};
+exports.getRandomInt = getRandomInt;
 const getIAT = () => {
     return Math.floor(Date.now() / 1000) + 257;
 };

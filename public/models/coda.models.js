@@ -18,20 +18,18 @@ exports.placeOrderParams = joi_1.default.object({
             }),
         })
             .required(),
+        customerId: joi_1.default.string().required(),
     }),
 });
 exports.getOrderParams = joi_1.default.object({
     method: joi_1.default.string().valid("getOrder"),
     params: joi_1.default.object({
         orderId: joi_1.default.string().required(),
-        iat: joi_1.default.number(),
     }),
 });
 exports.listSkuParams = joi_1.default.object({
     method: joi_1.default.string().valid("listSku"),
-    params: joi_1.default.object({
-        iat: joi_1.default.number(),
-    }),
+    params: joi_1.default.object({}),
 });
 exports.validateParams = joi_1.default.object({
     method: joi_1.default.string().valid("validate"),
@@ -44,6 +42,8 @@ exports.validateParams = joi_1.default.object({
                 amount: joi_1.default.number().required(),
             }),
         }),
+        userAccount: joi_1.default.string().required(),
+        customerId: joi_1.default.string().required(),
     }),
 });
 exports.topupParams = joi_1.default.object({
@@ -59,10 +59,10 @@ exports.topupParams = joi_1.default.object({
             }),
         }),
     }),
+    userAccount: joi_1.default.string().required(),
+    customerId: joi_1.default.string().required(),
 });
 exports.listServerParams = joi_1.default.object({
     method: joi_1.default.string().valid("listServer"),
-    params: joi_1.default.object({
-        iat: joi_1.default.number(),
-    }),
+    params: joi_1.default.object({}),
 });

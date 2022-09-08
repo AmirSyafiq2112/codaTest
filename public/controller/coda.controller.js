@@ -19,8 +19,8 @@ const coda_helper_1 = require("../helper/coda.helper");
 const coda_helper_2 = require("../helper/coda.helper");
 const coda_models_1 = require("../models/coda.models");
 // const sampleToken = process.env.SAMPLE_VOUCHER_TOKEN!;
-// const url = "https://xshop.codashop.com/";           /*for staging*/
-const url = process.env.CODA_VOUCHER_URL; /*for development*/
+// const url = process.env.CODA_PRODUCTION_URL;        /*for production*/
+const url = process.env.CODA_VOUCHER_URL; /*for staging*/
 const secret = process.env.CODA_SECRET_KEY;
 const apiKey = process.env.CODA_API_KEY;
 const clientId = process.env.CODA_CLIENT_ID;
@@ -33,65 +33,16 @@ var jsonPassedMethod;
 //updating the params sent from main Api differently by each methods requirements
 const paramsSentToCoda = (methodSent, objSent) => {
     var jsonrpc = "2.0";
-    var id = "customersIdHere";
+    var id = (0, coda_helper_2.getRandomInt)();
     var method = methodSent;
     var params = {};
     var methodToString = Object(method);
-    if (methodToString == "placeOrder") {
-        console.log(`method: ${methodToString}`);
-        let newParams = Object.assign({}, objSent, {
-            customerId: "1",
-            iat: (0, coda_helper_2.getIAT)(),
-        });
-        params = newParams;
-        createJson({ jsonrpc, id, method, params });
-    }
-    else if (methodToString == "getOrder") {
-        console.log(`method: ${methodToString}`);
-        let newParams = Object.assign({}, objSent, {
-            orderId: "1",
-            iat: (0, coda_helper_2.getIAT)(),
-        });
-        params = newParams;
-        createJson({ jsonrpc, id, method, params });
-    }
-    else if (methodToString == "listSku") {
-        console.log(`method: ${methodToString}`);
-        let newParams = Object.assign({}, objSent, {
-            iat: (0, coda_helper_2.getIAT)(),
-        });
-        params = newParams;
-        createJson({ jsonrpc, id, method, params });
-    }
-    else if (methodToString == "listServer") {
-        console.log(`method: ${methodToString}`);
-        let newParams = Object.assign({}, objSent, {
-            customerId: "1",
-            iat: (0, coda_helper_2.getIAT)(),
-        });
-        params = newParams;
-        createJson({ jsonrpc, id, method, params });
-    }
-    else if (methodToString == "validate") {
-        console.log(`method: ${methodToString}`);
-        let newParams = Object.assign({}, objSent, {
-            userAccount: "userId_zoneId",
-            customerId: "1",
-            iat: (0, coda_helper_2.getIAT)(),
-        });
-        params = newParams;
-        createJson({ jsonrpc, id, method, params });
-    }
-    else if (methodToString == "topup") {
-        console.log(`method: ${methodToString}`);
-        let newParams = Object.assign({}, objSent, {
-            userAccount: "userId_zoneId",
-            customerId: "1",
-            iat: (0, coda_helper_2.getIAT)(),
-        });
-        params = newParams;
-        createJson({ jsonrpc, id, method, params });
-    }
+    console.log(`method: ${methodToString}`);
+    let newParams = Object.assign({}, objSent, {
+        iat: (0, coda_helper_2.getIAT)(),
+    });
+    params = newParams;
+    createJson({ jsonrpc, id, method, params });
 };
 const createJson = (newJsonParams) => {
     newJson = newJsonParams;
@@ -185,11 +136,10 @@ const codaVoucher = (payload, token) => __awaiter(void 0, void 0, void 0, functi
         console.log(response.data);
     })
         .catch((error) => {
-        console.log(error.response.status + " " + error.response.statusText);
-        console.log(error.response.data);
         //for logging error
-        codaLog_helper_1.logger.error(error.response.status + " " + error.response.statusText);
-        codaLog_helper_1.logger.error(error.response.data);
+        codaLog_helper_1.logger.error(error.response.status + " " + error.response.statusText, {
+            method: jsonPassedMethod,
+        });
     });
 });
 exports.codaVoucher = codaVoucher;
